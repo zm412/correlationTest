@@ -1,0 +1,17 @@
+
+{% extends "correlation/layout.html" %}
+{% load static %}
+
+{% block body %}
+    {% if user.is_authenticated %}
+              {% csrf_token %}
+              <input  type='submit' id="sendInf">
+
+ 
+
+
+
+    {% csrf_token %}
+    {% endif %}
+
+{% endblock %}
