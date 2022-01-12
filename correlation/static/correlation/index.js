@@ -1,50 +1,70 @@
 document.addEventListener('DOMContentLoaded', function() {
   let buttonSend = document.querySelector('#sendInf')
+  let add_data = document.querySelector('#add_data')
+  let collect_info = document.querySelector('#collect_info')
+  let x_tbl = document.querySelector('#new_x')
+  let y_tbl = document.querySelector('#new_y')
   buttonSend.addEventListener('click', function(e){ 
-    e.preventDefault()
-    send_info()})
+    fetchDataPost('calculate/', collect_data());
+  })
+
+  add_data.addEventListener('click', function(e){
+    add_data_func(x_tbl, 'x')
+    add_data_func(y_tbl, 'y')
+  })
+
+  collect_info.addEventListener('click', function(e){
+    collect_data()
+  })
+
 
 })
 
-function send_info(e){
-  let obj = {
-    "user_id": 1,
-    "data": {
-        "x_data_type": "steps",
-        "y_data_type": "pulse",
-        "x":[
-            {
-                "date": "2022-01-01",
-                "value": 0.5
-            },
-            {
-                "date": "2022-01-01",
-                "value": 1.5
-            },
-            {
-                "date": "2022-01-01",
-                "value": 2.5
-            },
-        ],
-        "y":[
-            {
-                "date": "2022-01-01",
-                "value": 3.5
-            },
-            {
-                "date": "2022-01-01",
-                "value": 4.5
-            },
-            {
-                "date": "2022-01-01",
-                "value": 5.5
-            },
-        ]
+function collect_arr(side){
+  let arr = [];
+
+  for(let elem of document.querySelectorAll(`.${side}_obj_class`)){
+    console.log(elem, 'elem')
+    let tempObj = {
+      'data': elem.firstElementChild.value,
+      'value': elem.lastElementChild.value
     }
+    arr.push(tempObj)
+  }
+  return arr;
 }
 
-  fetchDataPost('calculate/', obj);
+function collect_data(){
+  let user_id = document.querySelector('#user_id').value;
+  let x_str = document.querySelector('#x_str').value;
+  let y_str = document.querySelector('#y_str').value;
+  let result_show = document.querySelector('#result');
+  let x_data_arr = collect_arr('x');
+  let y_data_arr = collect_arr('y');
+  let result = {
+    'user_id': user_id,
+    'data': {
+      'x_data_type': x_str,
+      'y_data_type': y_str,
+      'x': x_data_arr,
+      'y': y_data_arr
+    },
+  }
+
+  result_show.innerHTML = JSON.stringify(result)
+  return result;
 }
+
+function add_data_func(elem, side){
+  elem.insertAdjacentHTML('beforeend', `
+    <p class=${side}_obj_class>
+      <input  class="date_class" placeholder='date'>
+      <input  class="value_class" placeholder='value'>
+    </p>
+
+  `)
+}
+
 
 async function fetchDataGet() {
     try {

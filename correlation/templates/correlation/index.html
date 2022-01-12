@@ -5,9 +5,44 @@
 {% block body %}
     {% if user.is_authenticated %}
               {% csrf_token %}
-              <input  type='submit' id="sendInf">
-
+     <div id='form_generator'>
  
+      <table> 
+        <tr>
+          <td>User id <input placeholder='user id' id='user_id'> </td>
+          <td></td>
+        </tr>
+        <tr>
+
+        <td id="new_x">Str x <input id='x_str'>
+              <p class="x_obj_class">
+                <input  class='x_date_class' type="">
+                <input  class='x_value_class' type="">
+              </p>
+
+          </td>
+          <td id="new_y">Str y <input id='y_str'>
+              <p class="y_obj_class">
+                  <input  class='y_date_class' type="">
+                  <input  class='y_value_class' type="">
+                </p>
+              </tr>
+            </table>
+
+          </td>
+        </tr>
+        
+        <tr>
+          <td><input type="submit" value='Add line' id='add_data'></td>
+        </tr>
+        
+      </table>
+          <input  type='submit' id="sendInf" value='Send collection'>
+          <input  type='submit' id="collect_info" value='Collect info'>
+
+     </div>
+ 
+     <div id='result'> </div>
 
 
 
