@@ -92,9 +92,3 @@ venv/
 *~
 __pycache__
 venv
-/media
-/venv
-*.pyc
-*~
-db.sqlite3
-.DS_Store

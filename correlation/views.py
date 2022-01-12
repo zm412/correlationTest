@@ -14,9 +14,11 @@ from scipy.stats.stats import pearsonr
 from .models import User, Data_type, Correlation_data
 
 def index(request):
+
     if(Data_type.objects.all().count() == 0):
         Data_type.objects.create(type_name='steps')
         Data_type.objects.create(type_name='pulse')
+
     print(Data_type.objects.all(), 'ALL')
     print(Correlation_data.objects.all(), 'Data')
 
