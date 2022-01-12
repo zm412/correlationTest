@@ -29,8 +29,8 @@ class Correlation_data(models.Model):
     def __str__(self):
         return "user: {}, x_data: {}, y_data:{}, corr:{}, corrP: {},  day: {}".format(
             self.user.username,
-            self.x_data,
-            self.y_data,
+            self.x_data.type_name,
+            self.y_data.type_name,
             self.correlation,
             self.correlation_p,
             self.day_name,
@@ -39,8 +39,8 @@ class Correlation_data(models.Model):
     def serialize(self):
         return {
             "user_id": self.user.id,
-            "x_data_type": self.x_data,
-            "y_data_type": self.y_data,
+            "x_data_type": self.x_data.type_name,
+            "y_data_type": self.y_data.type_name,
             "correlation": {
                 "value": self.correlation,
                 "p_value": self.correlation_p,

@@ -48,9 +48,9 @@ def extract_numbers(arr):
     flag = True
     print(arr, 'arr')
     for a in arr:
-      if 'value' in a and type(a['value']) == float:
-        print(type(a['value']) == float, 'a')
-        new_arr.append(a['value'])
+      if 'value' in a and type(float( a['value'] )) == float:
+        print(type(float( a['value'] )) == float, 'a')
+        new_arr.append(float( a['value'] ))
       else:
         flag = False
         break
@@ -81,10 +81,12 @@ def verification_received_data(row_data):
       return False
     
 def correlation_view(request):
+    print(request.GET, 'request')
     data = request.GET.copy()
     x_data_str = data["x_data_type"]
     y_data_str = data["y_data_type"]
     user_id = data["user_id"]
+    print(x_data_str, y_data_str, user_id, 'LDJLKJLJ')
     try:
         curr_user = User.objects.get(id=user_id)
         try:
@@ -96,8 +98,8 @@ def correlation_view(request):
                             x_data=x_data_type,
                             y_data=y_data_type,
                             )               
-                    print(answ, "answ")
-                    return render(request, "correlation/index.html", {"answer": answ})
+                    print([a.serialize() for a in  answ ], "answ")
+                    return JsonResponse( {"answer": [a.serialize() for a in  answ ]})
                 except Correlation_data.DoesNotExist:
                     return HttpResponseNotFound()
             except Data_type.DoesNotExist:
@@ -121,25 +123,26 @@ def calculate_view(request):
     message = ''
     if request.method == "POST":
         row_data = json.loads(request.body)
+        print(row_data, 'LJLJLKJ')
         try:
             curr_user = User.objects.get(id=row_data["user_id"])
             try:
                 x_data_type = Data_type.objects.get(type_name=row_data['data']['x_data_type'])
                 try:
-                    date = row_data['data']['x'][0]['date']
+                    date_c = row_data['data']['x'][0]['date']
+                    print(date_c, "DATE")
                     x_data_type = Data_type.objects.get(type_name=row_data['data']['x_data_type'])
                     y_data_type = Data_type.objects.get(type_name=row_data['data']['y_data_type'])
-                    c =  calc_p(verification_received_data(row_data))
+                    c = calc_p(verification_received_data(row_data))
 
                     new_correlation = Correlation_data.objects.create(user=curr_user, 
                             x_data=x_data_type,
                             y_data=y_data_type,
                             correlation=c[0],
                             correlation_p=c[1],
-                            day_name=date
+                            day_name=date_c
                             )
                     message = 'new correlation is created'
-                    
                 except Data_type.DoesNotExist:
                     message = "There is no such type in the system"
             except Data_type.DoesNotExist:
