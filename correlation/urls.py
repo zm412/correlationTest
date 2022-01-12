@@ -9,5 +9,6 @@ urlpatterns = [
     path("register", views.register, name="register"),
     path("calculate/", views.calculate_view),
     path("correlation", views.correlation_view, name="correlation"),
-    path("create_type/<str:name>", views.create_type),
+    path("create_type/", views.create_type, name='create_type'),
+    path("delete_type/<int:type_id>", views.delete_type, name='delete_type'),
 ]

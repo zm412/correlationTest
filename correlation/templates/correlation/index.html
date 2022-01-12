@@ -41,8 +41,13 @@
           <input  type='submit' id="collect_info" value='Collect info'>
 
      </div>
- 
+     
      <div id='result'> </div>
+
+     <br> 
+     <br> 
+     <br> 
+     <hr>
 
      <div id="get_corr">
         <input id="user_id_get" placeholder="User ID">
@@ -50,8 +55,32 @@
         <input id="y_data_type" placeholder="Y type">
         <input type="submit"  id='get_corr_button' value="Get correlation">
      </div>
+     
      <div id="answer_1"></div>
+
+     <br> 
+     <br> 
+     <br> 
+     <hr>
+
      <div id="get_all"></div>
+    <div>
+      <h3>Types</h3>
+          {% for c in types %}
+          {{ c }}
+          <p>{{ c.type_name }} <a href="{% url 'delete_type' c.id  %}">Delete type</a></p>
+          {% endfor %}
+
+    </div>
+
+
+     <div id='new_type'>
+       <form action= "{% url 'create_type'  %}" method="POST">
+              {% csrf_token %}
+         <input name="type_name" placeholder='Add new type'>
+         <input type="submit">
+       </form>
+     </div>
 
 
     {% csrf_token %}

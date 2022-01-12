@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
   let buttonSend = document.querySelector('#sendInf')
+  let new_type = document.querySelector('#new_type')
   let add_data = document.querySelector('#add_data')
   let collect_info = document.querySelector('#collect_info')
   let x_tbl = document.querySelector('#new_x')
@@ -24,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
       let user_id_get = document.querySelector('#user_id_get').value;
       const response = await fetch(`/correlation?x_data_type=${x_type}&y_data_type=${y_type}&user_id=${user_id_get}`);
       const json = await response.json();
-      answ.innerHTML = JSON.stringify(json);
+      answ.innerHTML = JSON.stringify(json.answer);
       console.log(json, 'json')
     } catch (e) {
         console.error(e);

@@ -10,20 +10,32 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from scipy.stats.stats import pearsonr   
+from django.views.generic.list import ListView
 
 from .models import User, Data_type, Correlation_data
 
+class TypesListView(ListView):
+    model = Data_type 
+
+    class Meta:
+        model = Data_type 
+        fields = ["type_name"]
+
+
+    def get_types(self):
+        print(Correlation_data.objects.all())
+        list_t = Data_type.objects.all()
+        return list_t
+
+
+
 def index(request):
 
-    if(Data_type.objects.all().count() == 0):
-        Data_type.objects.create(type_name='steps')
-        Data_type.objects.create(type_name='pulse')
-
-    print(Data_type.objects.all(), 'ALL')
-    print(Correlation_data.objects.all(), 'Data')
+    print(TypesListView().get_types(), 'KKKKKK')
+    list_t = TypesListView().get_types()
 
     if request.user.is_authenticated:
-        return render(request, "correlation/index.html")
+        return render(request, "correlation/index.html", { 'types': [a for a in list_t] })
     else:
         return render(request, "correlation/login.html")
 
@@ -39,9 +51,23 @@ def check_dates(arr, date):
           break
     return flag
 
-def create_type(request, name):
-    Data_type.objects.create(type_name=name)
-    return render(request, "correlation/index.html")
+def create_type(request):
+    if request.method == "POST":
+        print(request.POST, 'ROWD')
+        try:
+            Data_type.objects.get(type_name=request.POST['type_name'])
+        except Data_type.DoesNotExist:
+            new_type = Data_type.objects.create(type_name=request.POST['type_name'])
+            print(new_type)
+    return HttpResponseRedirect(reverse("index"))
+
+
+def delete_type(request, type_id):
+    try:
+        Data_type.objects.get(id=type_id).delete()
+        return HttpResponseRedirect(reverse("index"))
+    except Data_type.DoesNotExist:
+        return HttpResponseNotFound()
 
 def extract_numbers(arr):
     new_arr = []
@@ -134,15 +160,25 @@ def calculate_view(request):
                     x_data_type = Data_type.objects.get(type_name=row_data['data']['x_data_type'])
                     y_data_type = Data_type.objects.get(type_name=row_data['data']['y_data_type'])
                     c = calc_p(verification_received_data(row_data))
+                    try:
+                        for_update = Correlation_data.objects.get(user=curr_user,
+                            x_data=x_data_type,
+                            y_data=y_data_type,
+                            day_name=date_c
+                            )
+                        for_update.correlation = c[0]
+                        for_update.correlation_p = c[1]
+                        for_update.save()
 
-                    new_correlation = Correlation_data.objects.create(user=curr_user, 
+                    except Correlation_data.DoesNotExist:
+                        new_correlation = Correlation_data.objects.create(user=curr_user, 
                             x_data=x_data_type,
                             y_data=y_data_type,
                             correlation=c[0],
                             correlation_p=c[1],
                             day_name=date_c
                             )
-                    message = 'new correlation is created'
+                        message = 'new correlation is created'
                 except Data_type.DoesNotExist:
                     message = "There is no such type in the system"
             except Data_type.DoesNotExist:
