@@ -12,6 +12,12 @@ class User(AbstractUser):
 class Data_type(models.Model):
     type_name = models.CharField(max_length=10)
 
+    def __str__(self):
+        return "id:{}, type_name: {}".format(
+            self.id,
+            self.type_name,
+        )
+
 class Correlation_data(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     x_data = models.ForeignKey(Data_type, on_delete=models.CASCADE, related_name='x_data_type')
@@ -21,7 +27,7 @@ class Correlation_data(models.Model):
     day_name = models.CharField(max_length=10)
 
     def __str__(self):
-        return "user: {}, x_data: {}, corr:{}, corrP: {},  day".format(
+        return "user: {}, x_data: {}, y_data:{}, corr:{}, corrP: {},  day: {}".format(
             self.user.username,
             self.x_data,
             self.y_data,

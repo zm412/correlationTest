@@ -78,17 +78,44 @@ def verification_received_data(row_data):
     else:
       return False
     
-
+def correlation_view(request):
+    data = request.GET.copy()
+    x_data_str = data["x_data_type"]
+    y_data_str = data["y_data_type"]
+    user_id = data["user_id"]
+    try:
+        curr_user = User.objects.get(id=user_id)
+        try:
+            x_data_type = Data_type.objects.get(type_name=x_data_str)
+            try:
+                y_data_type = Data_type.objects.get(type_name=y_data_str)
+                try:
+                    answ = Correlation_data.objects.filter(user=curr_user, 
+                            x_data=x_data_type,
+                            y_data=y_data_type,
+                            )               
+                    print(answ, "answ")
+                    return render(request, "correlation/index.html", {"answer": answ})
+                except Correlation_data.DoesNotExist:
+                    return HttpResponseNotFound()
+            except Data_type.DoesNotExist:
+                return HttpResponseNotFound()
+        except Data_type.DoesNotExist:
+            print(Data_type.objects.get(type_name='steps'), 'ALL')
+            return HttpResponseNotFound()
+    except User.DoesNotExist:
+        return HttpResponseNotFound()
 
 def calc_p(ver_data):
     if(ver_data):
-      (a, b) = ver_data   
-      result = pearsonr(a,b)
-      return result
+          (a, b) = ver_data   
+          result = pearsonr(a,b)
+          print(result, 'result')
+          return result
     else:
-      return False 
+          return False 
 
-def calculate(request):
+def calculate_view(request):
     message = ''
     if request.method == "POST":
         row_data = json.loads(request.body)
@@ -101,6 +128,7 @@ def calculate(request):
                     x_data_type = Data_type.objects.get(type_name=row_data['data']['x_data_type'])
                     y_data_type = Data_type.objects.get(type_name=row_data['data']['y_data_type'])
                     c =  calc_p(verification_received_data(row_data))
+
                     new_correlation = Correlation_data.objects.create(user=curr_user, 
                             x_data=x_data_type,
                             y_data=y_data_type,
