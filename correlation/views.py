@@ -5,7 +5,7 @@ from django import forms
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import (HttpResponse, HttpResponseNotFound,
-                         HttpResponseRedirect, JsonResponse)
+                         HttpResponseRedirect, JsonResponse, Http404)
 from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
@@ -127,14 +127,14 @@ def correlation_view(request):
                     print([a.serialize() for a in  answ ], "answ")
                     return JsonResponse( {"answer": [a.serialize() for a in  answ ]})
                 except Correlation_data.DoesNotExist:
-                    return HttpResponseNotFound()
+                    raise Http404
             except Data_type.DoesNotExist:
-                return HttpResponseNotFound()
+                raise Http404
         except Data_type.DoesNotExist:
             print(Data_type.objects.get(type_name='steps'), 'ALL')
-            return HttpResponseNotFound()
+            raise Http404
     except User.DoesNotExist:
-        return HttpResponseNotFound()
+        raise Http404
 
 def calc_p(ver_data):
     if(ver_data):
@@ -169,6 +169,8 @@ def calculate_view(request):
                         for_update.correlation = c[0]
                         for_update.correlation_p = c[1]
                         for_update.save()
+                        message = "Correlation is updated"
+                        return HttpResponseRedirect(reverse("index"), status=200)
 
                     except Correlation_data.DoesNotExist:
                         new_correlation = Correlation_data.objects.create(user=curr_user, 
@@ -179,17 +181,19 @@ def calculate_view(request):
                             day_name=date_c
                             )
                         message = 'new correlation is created'
+                        return HttpResponseRedirect(reverse("index"), status=200)
                 except Data_type.DoesNotExist:
                     message = "There is no such type in the system"
+                    raise Http404
             except Data_type.DoesNotExist:
                 message = "There is no such type in the system"
- 
+                raise Http404
         except User.DoesNotExist:
             message = "There is no such user in the system"
-        print(message, MESSAGE)
-        return message
+            raise Http404
+        print(message, "MESSAGE")
     else:
-        print(message, MESSAGE)
+        print(message, "MESSAGE")
         return HttpResponseNotFound()
 
 
