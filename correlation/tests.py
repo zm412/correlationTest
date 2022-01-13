@@ -1,10 +1,11 @@
 
-from django.test import TestCase, Client
-from correlation.models import User, Data_type, Correlation_data
-from datetime import timedelta, datetime
-from django.urls import reverse
 import json
+from datetime import datetime, timedelta
 
+from django.test import Client, TestCase
+from django.urls import reverse
+
+from correlation.models import Correlation_data, Data_type, User
 
 # Create your tests here.
 

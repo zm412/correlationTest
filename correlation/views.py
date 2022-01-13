@@ -4,15 +4,16 @@ from datetime import datetime, timedelta
 from django import forms
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.http import (HttpResponse, HttpResponseNotFound,
-                         HttpResponseRedirect, JsonResponse, Http404)
+from django.http import (Http404, HttpResponse, HttpResponseNotFound,
+                         HttpResponseRedirect, JsonResponse)
 from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
-from scipy.stats.stats import pearsonr   
 from django.views.generic.list import ListView
+from scipy.stats.stats import pearsonr
 
-from .models import User, Data_type, Correlation_data
+from .models import Correlation_data, Data_type, User
+
 
 class TypesListView(ListView):
     model = Data_type 
