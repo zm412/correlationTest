@@ -24,7 +24,6 @@ class TypesListView(ListView):
 
 
     def get_types(self):
-        print(Correlation_data.objects.all())
         list_t = Data_type.objects.all()
         return list_t
 
@@ -32,7 +31,6 @@ class TypesListView(ListView):
 
 def index(request):
 
-    print(TypesListView().get_types(), 'KKKKKK')
     list_t = TypesListView().get_types()
 
     if request.user.is_authenticated:
@@ -42,9 +40,7 @@ def index(request):
 
 def check_dates(arr, date):
     flag = True
-    print(arr, 'arr')
     for a in arr:
-      print(a['date'], 'a')
       if a['date'] == date:
           continue
       else:
@@ -54,12 +50,10 @@ def check_dates(arr, date):
 
 def create_type(request):
     if request.method == "POST":
-        print(request.POST, 'ROWD')
         try:
             Data_type.objects.get(type_name=request.POST['type_name'])
         except Data_type.DoesNotExist:
             new_type = Data_type.objects.create(type_name=request.POST['type_name'])
-            print(new_type)
     return HttpResponseRedirect(reverse("index"))
 
 
@@ -73,10 +67,8 @@ def delete_type(request, type_id):
 def extract_numbers(arr):
     new_arr = []
     flag = True
-    print(arr, 'arr')
     for a in arr:
       if 'value' in a and type(float( a['value'] )) == float:
-        print(type(float( a['value'] )) == float, 'a')
         new_arr.append(float( a['value'] ))
       else:
         flag = False
@@ -90,16 +82,12 @@ def extract_numbers(arr):
 def verification_received_data(row_data):
     x_arr = extract_numbers(row_data['data']['x'])
     y_arr = extract_numbers(row_data['data']['y'])
-    print(x_arr, 'xarr')
-    print(y_arr, 'yarr')
     date = row_data['data']['x'][0]['date']
     x_dates = []
     y_dates = []
     if(x_arr and y_arr):
       x_dates = check_dates(row_data['data']['x'], date)
       y_dates = check_dates(row_data['data']['y'], date)
-      print(x_dates, 'x_dates')
-      print(y_dates, 'y_dates')
       if len(x_arr) != len(y_arr) :
         return False
       else:
@@ -108,12 +96,10 @@ def verification_received_data(row_data):
       return False
     
 def correlation_view(request):
-    print(request.GET, 'request')
     data = request.GET.copy()
     x_data_str = data["x_data_type"]
     y_data_str = data["y_data_type"]
     user_id = data["user_id"]
-    print(x_data_str, y_data_str, user_id, 'LDJLKJLJ')
     try:
         curr_user = User.objects.get(id=user_id)
         try:
@@ -125,14 +111,12 @@ def correlation_view(request):
                             x_data=x_data_type,
                             y_data=y_data_type,
                             )               
-                    print([a.serialize() for a in  answ ], "answ")
                     return JsonResponse( {"answer": [a.serialize() for a in  answ ]})
                 except Correlation_data.DoesNotExist:
                     raise Http404
             except Data_type.DoesNotExist:
                 raise Http404
         except Data_type.DoesNotExist:
-            print(Data_type.objects.get(type_name='steps'), 'ALL')
             raise Http404
     except User.DoesNotExist:
         raise Http404
@@ -141,23 +125,19 @@ def calc_p(ver_data):
     if(ver_data):
           (a, b) = ver_data   
           result = pearsonr(a,b)
-          print(result, 'result')
           return result
     else:
           return False 
 
 def calculate_view(request):
-    message = ''
     if request.method == "POST":
         row_data = json.loads(request.body)
-        print(row_data, 'LJLJLKJ')
         try:
             curr_user = User.objects.get(id=row_data["user_id"])
             try:
                 x_data_type = Data_type.objects.get(type_name=row_data['data']['x_data_type'])
                 try:
                     date_c = row_data['data']['x'][0]['date']
-                    print(date_c, "DATE")
                     x_data_type = Data_type.objects.get(type_name=row_data['data']['x_data_type'])
                     y_data_type = Data_type.objects.get(type_name=row_data['data']['y_data_type'])
                     c = calc_p(verification_received_data(row_data))
@@ -170,7 +150,6 @@ def calculate_view(request):
                         for_update.correlation = c[0]
                         for_update.correlation_p = c[1]
                         for_update.save()
-                        message = "Correlation is updated"
                         return HttpResponseRedirect(reverse("index"), status=200)
 
                     except Correlation_data.DoesNotExist:
@@ -181,20 +160,14 @@ def calculate_view(request):
                             correlation_p=c[1],
                             day_name=date_c
                             )
-                        message = 'new correlation is created'
                         return HttpResponseRedirect(reverse("index"), status=200)
                 except Data_type.DoesNotExist:
-                    message = "There is no such type in the system"
                     raise Http404
             except Data_type.DoesNotExist:
-                message = "There is no such type in the system"
                 raise Http404
         except User.DoesNotExist:
-            message = "There is no such user in the system"
             raise Http404
-        print(message, "MESSAGE")
     else:
-        print(message, "MESSAGE")
         return HttpResponseNotFound()
 
 
